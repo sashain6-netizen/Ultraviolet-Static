@@ -28,28 +28,33 @@
 
   async function initProxy() {
     try {
-      // 1. Initialize connection
+      // 1. Initialize connection (false = standard Worker, more stable than SharedWorker)
       const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now(), false);
+      
       window.BareMux = {
         BareMuxConnection: BareMuxConnection,
         connection: connection
       };
 
-      // 2. WAKE UP: Instead of manual postMessage, we call a getter.
-      // This internally triggers the worker's message port.
-      try {
-          await connection.getTransport();
-      } catch(e) {
-          // It's okay if this fails/errors initially, it just wakes up the thread.
-      }
-
-      // 3. Set transport using the URL string
-      await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
+      // 2. Set transport (Using a versioned CDN and reliable Wisp)
+      await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.ruby-dev.live/" }]);
 
       console.log("✅ Proxy Engine Loaded and Ready");
+
+      // 3. NOW manually load your other scripts to ensure they have a connection
+      loadScript("register-sw.js");
+      loadScript("search.js");
+      loadScript("index.js");
+
     } catch (err) {
       console.error("❌ Module Load Error:", err);
     }
+  }
+
+  function loadScript(src) {
+    const s = document.createElement('script');
+    s.src = src;
+    document.head.appendChild(s);
   }
 
   initProxy();
