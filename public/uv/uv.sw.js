@@ -788,7 +788,19 @@ function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
   }
 }
 
+// This is the crucial part:
 const sw = new UVServiceWorker();
+
+// We override the fetch event to use Bare-Mux
+const msgUpsert = (event) => {
+    const { data } = event;
+    if (data.type === 'registerBareMux') {
+        // This tells the SW to use the BareMux channel
+        sw.bareClient = data.channel; 
+    }
+};
+
+self.addEventListener('message', msgUpsert);
 
 self.addEventListener('fetch', (event) => {
     event.respondWith(sw.fetch(event));
