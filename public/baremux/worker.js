@@ -4,7 +4,7 @@
     let t = null;
 
     function a(e, t, a) {
-        console.error("error while processing '" + a + "': ", t);
+        console.error("error while processing " + a + ": ", t);
         e.postMessage({
             type: "error",
             error: t
@@ -74,7 +74,7 @@
                     s = new a(...i.client.args);
                     o = n;
                 } catch (e) {
-                    e.cause = "The BareTransport provided was invalid. Common causes of this are a default export that is not a class that implements BareTransport if you are using setTransport()";
+                    e.cause = "The BareTransport provided was invalid.";
                     throw e;
                 }
                 console.log("set transport to ", s, o);
@@ -93,13 +93,6 @@
                 s.ready || await s.init(), await n(i, l, s);
             } catch (e) {
                 a(l, e, "fetch");
-            } else if ("websocket" === i.type) try {
-                if (!s) throw r();
-                if (s instanceof MessagePort) return void c(i, l);
-                s.ready || await s.init();
-                // WebSocket logic...
-            } catch (e) {
-                a(l, e, "websocket");
             }
         };
     }
@@ -116,5 +109,5 @@
         l(self);
     }
 
-    console.debug("bare-mux: running v2.1.8 (build 75b1f5a)");
+    console.debug("bare-mux: running v2.1.8 (fixed syntax)");
 }();
