@@ -15,7 +15,7 @@ async function initProxy() {
     }
 
     console.log("BareMux found! Initializing connection...");
-    connection = new BareMux.BareMuxConnection("./baremux/worker.js");
+    connection = new BareMux.BareMuxConnection("/baremux/worker.js");
 }
 
 initProxy();
@@ -35,7 +35,7 @@ form.addEventListener("submit", async (event) => {
     if (!connection) {
         const CurrentBareMux = window.BareMux || window['@extended-lib/bare-mux'];
         if (CurrentBareMux) {
-            connection = new CurrentBareMux.BareMuxConnection("./baremux/worker.js");
+            connection = new CurrentBareMux.BareMuxConnection("/baremux/worker.js");
         }
     }
 
