@@ -27,24 +27,32 @@
   import { BareMuxConnection } from 'https://esm.sh/@mercuryworkshop/bare-mux@2.1.8';
   import * as Epoxy from 'https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1';
 
-  try {
-    const EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
-    
-    // Attach everything to a single global object to avoid CORS resolution issues
-    window.BareMux = { 
-      BareMuxConnection,
-      EpoxyClient 
-    };
-    
-    // Also set EpoxyClient globally just in case index.js looks for it specifically
-    window.EpoxyClient = EpoxyClient;
+  async function initProxy() {
+    try {
+      const EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
+      
+      // FIX: Added '?t=' + Date.now() to stop the "Pending" hang
+      const connection = new BareMuxConnection('/worker.js?t=' + Date.now());
 
-    console.log("✅ Proxy Engine Loaded and Ready");
-  } catch (err) {
-    console.error("❌ Module Load Error:", err);
+      window.BareMux = { 
+        BareMuxConnection,
+        EpoxyClient,
+        connection
+      };
+      
+      window.EpoxyClient = EpoxyClient;
+
+      // This actually starts the engine
+      await connection.setTransport(EpoxyClient, [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
+
+      console.log("✅ Proxy Engine Loaded and Ready");
+    } catch (err) {
+      console.error("❌ Module Load Error:", err);
+    }
   }
-</script>
 
+  initProxy();
+</script>
 <script src="uv/uv.bundle.js"></script>
 <script src="uv/uv.config.js"></script>
 
