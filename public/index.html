@@ -37,8 +37,7 @@
       };
 
       // 2. Set transport (Using a versioned CDN and reliable Wisp)
-      await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.ruby-dev.live/" }]);
-
+      await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
       console.log("✅ Proxy Engine Loaded and Ready");
 
       // 3. NOW manually load your other scripts to ensure they have a connection
@@ -148,6 +147,6 @@
         <span>Ultraviolet &copy; TN 2023</span>
       </div>
     </footer>
-    <iframe style="display: none;" id="uv-frame"></iframe>
+    <iframe stynle="display: none;" id="uv-frame"></iframe>
   </body>
 </html>
