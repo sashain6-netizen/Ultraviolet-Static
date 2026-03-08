@@ -25,37 +25,24 @@
     <link rel="stylesheet" href="index.css" />
 <script type="module">
   import { BareMuxConnection } from 'https://esm.sh/@mercuryworkshop/bare-mux@2.1.8';
-  import * as Epoxy from 'https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1';
 
   async function initProxy() {
     try {
-      // 1. Get the transport
-      const EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
-      
-      // 2. Establish connection to your worker
+      // 1. Establish connection to your worker file
       const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now());
 
+      // 2. Make it global so search.js and index.js can see it
       window.BareMux = { connection };
 
-      /* FIX: We pass a "Constructor Function" instead of the class itself.
-         This allows Bare-Mux to stringify the logic safely.
+      /* 3. IMPORTANT: Pass the URL string of Epoxy. 
+         This tells the worker to fetch the code itself, which 
+         avoids the "Unexpected identifier $" error.
       */
-      await connection.setTransport(() => {
-          // This internal function tells the worker how to find the class
-          return [window.EpoxyClient, "Epoxy"];
-      }, [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
+      await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
 
       console.log("✅ Proxy Engine Loaded and Ready");
     } catch (err) {
       console.error("❌ Module Load Error:", err);
-      
-      // EMERGENCY FALLBACK: If the above still fails, try the most basic string path
-      try {
-          console.log("Attempting fallback transport...");
-          await window.BareMux.connection.setTransport("https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1", [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
-      } catch(e) {
-          console.error("Fallback failed:", e);
-      }
     }
   }
 
