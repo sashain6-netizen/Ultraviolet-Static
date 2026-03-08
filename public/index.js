@@ -1,38 +1,33 @@
 "use strict";
 
 /**
- * Library Bridge: This ensures BareMux is defined from the CDN
+ * Library Bridge: Finding BareMux from CDN
+ * We check the window object for all common names used by the BareMux library.
  */
-const BareMux = window.BareMux || window['@extended-lib/bare-mux'];
-
-/**
- * @type {HTMLFormElement}
- */
-const form = document.getElementById("uv-form");
-/**
- * @type {HTMLInputElement}
- */
-const address = document.getElementById("uv-address");
-/**
- * @type {HTMLInputElement}
- */
-const searchEngine = document.getElementById("uv-search-engine");
-/**
- * @type {HTMLParagraphElement}
- */
-const error = document.getElementById("uv-error");
-/**
- * @type {HTMLPreElement}
- */
-const errorCode = document.getElementById("uv-error-code");
+const BareMux = window.BareMux || 
+                window['BareMux'] || 
+                window['@extended-lib/bare-mux'] || 
+                (window.BareMuxConnection ? { BareMuxConnection: window.BareMuxConnection } : null);
 
 // Check if BareMux loaded before trying to use it
 if (!BareMux) {
     console.error("BareMux is not defined. Check your script tags in index.html.");
 }
 
-// Ensure we use the BareMux namespace
-const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+/**
+ * @type {HTMLFormElement}
+ */
+const form = document.getElementById("uv-form");
+const address = document.getElementById("uv-address");
+const searchEngine = document.getElementById("uv-search-engine");
+const error = document.getElementById("uv-error");
+const errorCode = document.getElementById("uv-error-code");
+
+// INITIALIZE CONNECTION ONLY IF BAREMUX EXISTS
+let connection;
+if (BareMux) {
+    connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+}
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
