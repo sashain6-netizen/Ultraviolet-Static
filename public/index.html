@@ -31,7 +31,7 @@
     try {
       const EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
       
-      // FIX: Added '?t=' + Date.now() to stop the "Pending" hang
+      // Points to your specific subfolder
       const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now());
 
       window.BareMux = { 
@@ -42,8 +42,8 @@
       
       window.EpoxyClient = EpoxyClient;
 
-      // This actually starts the engine
-      await connection.setTransport(EpoxyClient, [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
+      // FIX: Use setManualTransport to bypass the AsyncFunction "$" syntax error
+      await connection.setManualTransport(EpoxyClient, [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
 
       console.log("✅ Proxy Engine Loaded and Ready");
     } catch (err) {
