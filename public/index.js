@@ -15,7 +15,7 @@ async function initProxy() {
     }
 
     console.log("BareMux found! Initializing connection...");
-    connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+    connection = new BareMux.BareMuxConnection("./baremux/worker.js");
 }
 
 initProxy();
@@ -35,7 +35,7 @@ form.addEventListener("submit", async (event) => {
     if (!connection) {
         const CurrentBareMux = window.BareMux || window['@extended-lib/bare-mux'];
         if (CurrentBareMux) {
-            connection = new CurrentBareMux.BareMuxConnection("/baremux/worker.js");
+            connection = new CurrentBareMux.BareMuxConnection("./baremux/worker.js");
         }
     }
 
@@ -58,15 +58,15 @@ form.addEventListener("submit", async (event) => {
     frame.style.display = "block";
 
     // Wisp/Epoxy Transport Logic
-    let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
-    
-    try {
-        if (await connection.getTransport() !== "/epoxy/index.mjs") {
-            await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
-        }
-    } catch (transportErr) {
-        console.warn("Transport setup failed, but attempting to load anyway:", transportErr);
-    }
+    // Replace your old wispUrl line with this:
+let wispUrl = "wss://wisp.mercuryworkshop.me/"; 
+
+try {
+    await connection.setTransport(window.EpoxyClient, [{ wisp: wispUrl }]);
+    console.log("✅ Transport set to Mercury Workshop Wisp");
+} catch (transportErr) {
+    console.warn("Transport setup failed:", transportErr);
+}
 
     frame.src = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
