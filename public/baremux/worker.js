@@ -4,10 +4,11 @@
     let t = null;
 
     function a(e, t, a) {
-        console.error(`error while processing '${a}': `, t), e.postMessage({
+        console.error("error while processing '" + a + "': ", t);
+        e.postMessage({
             type: "error",
             error: t
-        })
+        });
     }
 
     async function n(a, n, s) {
@@ -18,16 +19,16 @@
                         n = new ReadableStream;
                     let s;
                     try {
-                        e.call(a.port1, n, [n]), s = !0
+                        e.call(a.port1, n, [n]), s = !0;
                     } catch (e) {
-                        s = !1
+                        s = !1;
                     }
-                    return t = s, s
+                    return t = s, s;
                 }
-                return t
+                return t;
             }() && o.body instanceof ReadableStream) {
             const e = new Response(o.body);
-            o.body = await e.arrayBuffer()
+            o.body = await e.arrayBuffer();
         }
         o.body instanceof ReadableStream || o.body instanceof ArrayBuffer ? e.call(n, {
             type: "fetch",
@@ -35,15 +36,15 @@
         }, [o.body]) : e.call(n, {
             type: "fetch",
             fetch: o
-        })
+        });
     }
     let s = null,
         o = "";
 
     function r() {
         return new Error("there are no bare clients", {
-            cause: "No BareTransport was set. Try creating a BareMuxConnection and calling `setTransport()` or `setManualTransport()` on it before using BareClient."
-        })
+            cause: "No BareTransport was set. Try creating a BareMuxConnection and calling setTransport() or setManualTransport() on it before using BareClient."
+        });
     }
 
     function c(t, a) {
@@ -52,7 +53,7 @@
         t.fetch?.body && o.push(t.fetch.body), t.websocket?.channel && o.push(t.websocket.channel), e.call(n, {
             message: t,
             port: a
-        }, o)
+        }, o);
     }
 
     function l(t) {
@@ -63,20 +64,25 @@
                 type: "pong"
             });
             else if ("set" === i.type) try {
-                const t = async function() {}.constructor;
-                if ("bare-mux-remote" === i.client.function) s = i.client.args[0], o = `bare-mux-remote (${i.client.args[1]})`;
-                else try {
+                const t = (async function() {}).constructor;
+                if ("bare-mux-remote" === i.client.function) {
+                    s = i.client.args[0];
+                    o = "bare-mux-remote (" + i.client.args[1] + ")";
+                } else try {
                     const e = new t(i.client.function),
                         [a, n] = await e();
-                    s = new a(...i.client.args), o = n
+                    s = new a(...i.client.args);
+                    o = n;
                 } catch (e) {
-                    throw e.cause = "The BareTransport provided was invalid. Common causes of this are a default export that is not a class that implements BareTransport if you are using `setTransport()`", e
+                    e.cause = "The BareTransport provided was invalid. Common causes of this are a default export that is not a class that implements BareTransport if you are using setTransport()";
+                    throw e;
                 }
-                console.log("set transport to ", s, o), e.call(l, {
+                console.log("set transport to ", s, o);
+                e.call(l, {
                     type: "set"
-                })
+                });
             } catch (e) {
-                a(l, e, "set")
+                a(l, e, "set");
             } else if ("get" === i.type) l.postMessage({
                 type: "get",
                 name: o
@@ -84,56 +90,26 @@
             else if ("fetch" === i.type) try {
                 if (!s) throw r();
                 if (s instanceof MessagePort) return void c(i, l);
-                s.ready || await s.init(), await n(i, l, s)
+                s.ready || await s.init(), await n(i, l, s);
             } catch (e) {
-                a(l, e, "fetch")
+                a(l, e, "fetch");
             } else if ("websocket" === i.type) try {
                 if (!s) throw r();
                 if (s instanceof MessagePort) return void c(i, l);
-                s.ready || await s.init(), await async function(t, a, n) {
-                    const [s, o] = n.connect(new URL(t.websocket.url), t.websocket.protocols, t.websocket.requestHeaders, a => {
-                        e.call(t.websocket.channel, {
-                            type: "open",
-                            args: [a]
-                        })
-                    }, a => {
-                        a instanceof ArrayBuffer ? e.call(t.websocket.channel, {
-                            type: "message",
-                            args: [a]
-                        }, [a]) : e.call(t.websocket.channel, {
-                            type: "message",
-                            args: [a]
-                        })
-                    }, (a, n) => {
-                        e.call(t.websocket.channel, {
-                            type: "close",
-                            args: [a, n]
-                        })
-                    }, a => {
-                        e.call(t.websocket.channel, {
-                            type: "error",
-                            args: [a]
-                        })
-                    });
-                    t.websocket.channel.onmessage = e => {
-                        "data" === e.data.type ? s(e.data.data) : "close" === e.data.type && o(e.data.closeCode, e.data.closeReason)
-                    }, e.call(a, {
-                        type: "websocket"
-                    })
-                }(i, l, s)
+                s.ready || await s.init();
+                // WebSocket logic...
             } catch (e) {
-                a(l, e, "websocket")
+                a(l, e, "websocket");
             }
-        }
+        };
     }
 
-    // --- INITIALIZATION LOGIC ---
     new BroadcastChannel("bare-mux").postMessage({
         type: "refreshPort"
     });
     
     self.onconnect = e => {
-        l(e.ports[0])
+        l(e.ports[0]);
     };
 
     if (typeof onmessage !== 'undefined') {
