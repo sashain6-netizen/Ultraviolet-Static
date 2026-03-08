@@ -29,8 +29,7 @@
   async function initProxy() {
     try {
       // 1. Initialize connection
-      const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now());
-
+      const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now(), false);
       window.BareMux = {
         BareMuxConnection: BareMuxConnection,
         connection: connection
