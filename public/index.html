@@ -25,20 +25,23 @@
     <link rel="stylesheet" href="index.css" />
 <script type="module">
   import { BareMuxConnection } from 'https://esm.sh/@mercuryworkshop/bare-mux@2.1.8';
-  // Import everything as 'Epoxy' to handle naming changes
   import * as Epoxy from 'https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1';
 
-  console.log("🚀 Modules downloaded, initializing...");
-
   try {
-    window.BareMux = { BareMuxConnection };
+    const EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
     
-    // Check if it's a named export or a default export
-    window.EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
+    // Attach everything to a single global object to avoid CORS resolution issues
+    window.BareMux = { 
+      BareMuxConnection,
+      EpoxyClient 
+    };
     
-    console.log("✅ BareMux & Epoxy Globals set!");
+    // Also set EpoxyClient globally just in case index.js looks for it specifically
+    window.EpoxyClient = EpoxyClient;
+
+    console.log("✅ Proxy Engine Loaded and Ready");
   } catch (err) {
-    console.error("❌ Initialization failed:", err);
+    console.error("❌ Module Load Error:", err);
   }
 </script>
 
