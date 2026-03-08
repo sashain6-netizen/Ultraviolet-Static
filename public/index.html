@@ -28,16 +28,16 @@
 
   async function initProxy() {
     try {
-      // 1. Establish connection to your worker file
+      // 1. Create the connection
       const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now());
 
-      // 2. Make it global so search.js and index.js can see it
-      window.BareMux = { connection };
+      // 2. THIS IS THE FIX: Define the global object exactly how index.js expects it
+      window.BareMux = {
+        BareMuxConnection: BareMuxConnection, // Adds the constructor
+        connection: connection                // Adds the active instance
+      };
 
-      /* 3. IMPORTANT: Pass the URL string of Epoxy. 
-         This tells the worker to fetch the code itself, which 
-         avoids the "Unexpected identifier $" error.
-      */
+      // 3. Set transport using the URL (to avoid the "$" syntax error)
       await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
 
       console.log("✅ Proxy Engine Loaded and Ready");
