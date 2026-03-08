@@ -32,8 +32,19 @@ if (BareMux) {
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    // Re-check for BareMux right when the user clicks 'Submit'
+    const CurrentBareMux = window.BareMux || window['@extended-lib/bare-mux'];
+    
+    if (!connection && CurrentBareMux) {
+        connection = new CurrentBareMux.BareMuxConnection("/baremux/worker.js");
+    }
+
+    if (!connection) {
+        error.textContent = "Proxy engine is still loading or failed to load. Please refresh.";
+        return;
+    }
+
     try {
-        // This function must be defined in your register-sw.js
         await registerSW();
     } catch (err) {
         error.textContent = "Failed to register service worker.";
@@ -42,21 +53,19 @@ form.addEventListener("submit", async (event) => {
     }
 
     const url = search(address.value, searchEngine.value);
-
     let frame = document.getElementById("uv-frame");
     frame.style.display = "block";
 
-    // Wisp/Epoxy Transport Logic
     let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
     
     try {
+        // Use the connection we just verified
         if (await connection.getTransport() !== "/epoxy/index.mjs") {
             await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
         }
     } catch (transportErr) {
-        console.warn("Transport setup failed, but attempting to load anyway:", transportErr);
+        console.warn("Transport setup failed:", transportErr);
     }
 
-    // Load the proxied URL into the iframe
     frame.src = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
