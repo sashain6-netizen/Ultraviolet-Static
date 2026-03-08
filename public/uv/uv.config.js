@@ -1,7 +1,6 @@
-// This file overwrites the stock UV config.js
 self.__uv$config = {
   prefix: "/uv/service/",
-  // This is the missing piece!
+  // We leave this as a placeholder because the Wisp transport will take over
   bare: "https://tomp.app/", 
   encodeUrl: Ultraviolet.codec.xor.encode,
   decodeUrl: Ultraviolet.codec.xor.decode,
