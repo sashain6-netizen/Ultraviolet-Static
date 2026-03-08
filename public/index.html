@@ -28,6 +28,7 @@
 
   async function initProxy() {
     try {
+      // 1. Initialize connection
       const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now());
 
       window.BareMux = {
@@ -35,13 +36,15 @@
         connection: connection
       };
 
-      // 1. FORCE WAKE UP: Send a message immediately to kickstart the worker
-      // This moves it out of 'Pending' status
-      if (connection.worker) {
-          connection.worker.postMessage({ type: 'ping' });
+      // 2. WAKE UP: Instead of manual postMessage, we call a getter.
+      // This internally triggers the worker's message port.
+      try {
+          await connection.getTransport();
+      } catch(e) {
+          // It's okay if this fails/errors initially, it just wakes up the thread.
       }
 
-      // 2. Set transport using the URL string
+      // 3. Set transport using the URL string
       await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
 
       console.log("✅ Proxy Engine Loaded and Ready");
