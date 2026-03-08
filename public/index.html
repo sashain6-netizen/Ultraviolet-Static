@@ -28,16 +28,20 @@
 
   async function initProxy() {
     try {
-      // 1. Create the connection
       const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now());
 
-      // 2. THIS IS THE FIX: Define the global object exactly how index.js expects it
       window.BareMux = {
-        BareMuxConnection: BareMuxConnection, // Adds the constructor
-        connection: connection                // Adds the active instance
+        BareMuxConnection: BareMuxConnection,
+        connection: connection
       };
 
-      // 3. Set transport using the URL (to avoid the "$" syntax error)
+      // 1. FORCE WAKE UP: Send a message immediately to kickstart the worker
+      // This moves it out of 'Pending' status
+      if (connection.worker) {
+          connection.worker.postMessage({ type: 'ping' });
+      }
+
+      // 2. Set transport using the URL string
       await connection.setTransport('https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1', [{ wisp: "wss://wisp.mercuryworkshop.me/" }]);
 
       console.log("✅ Proxy Engine Loaded and Ready");
