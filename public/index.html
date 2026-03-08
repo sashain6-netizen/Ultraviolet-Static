@@ -24,24 +24,30 @@
     <link rel="shortcut icon" content="favicon.ico" />
     <link rel="stylesheet" href="index.css" />
 <script type="module">
-  // 1. Import as a namespace to avoid the "does not provide an export" error
-  import * as BareMux from 'https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux@2.1.8/dist/index.js';
+  import * as BareMuxModule from 'https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux@2.1.8/dist/index.js';
   import * as Epoxy from 'https://esm.sh/@mercuryworkshop/epoxy-transport@3.0.1';
 
-  // 2. Define your worker code string (Keep the one you have, just ensure it's here)
-  const workerCode = `!function(){ /* ... your worker code ... */ }(); if (typeof onmessage !== 'undefined') l(self);`;
+  // 1. Find the real Connection class (it might be in the root or in .default)
+  const BareMuxConnection = BareMuxModule.BareMuxConnection || BareMuxModule.default?.BareMuxConnection;
+
+  if (!BareMuxConnection) {
+    console.error("❌ Could not find BareMuxConnection in the module. Available keys:", Object.keys(BareMuxModule));
+  }
+
+  // 2. Define your worker code string (Ensure it's the full code from before)
+  const workerCode = `!function(){ /* ... ENTIRE WORKER CODE ... */ }(); if (typeof onmessage !== 'undefined') l(self);`;
 
   const blob = new Blob([workerCode], { type: 'application/javascript' });
   const workerUrl = URL.createObjectURL(blob);
 
-  // 3. Use BareMux.BareMuxConnection instead of just BareMuxConnection
-  const connection = new BareMux.BareMuxConnection(workerUrl);
+  // 3. Use the verified constructor
+  const connection = new BareMuxConnection(workerUrl);
 
   try {
     const EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
     
     window.BareMux = { 
-      BareMuxConnection: BareMux.BareMuxConnection,
+      BareMuxConnection,
       EpoxyClient,
       connection 
     };
