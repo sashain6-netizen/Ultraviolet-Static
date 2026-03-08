@@ -32,7 +32,7 @@
       const EpoxyClient = Epoxy.EpoxyClient || Epoxy.default;
       
       // FIX: Added '?t=' + Date.now() to stop the "Pending" hang
-      const connection = new BareMuxConnection('/worker.js?t=' + Date.now());
+      const connection = new BareMuxConnection('/baremux/worker.js?t=' + Date.now());
 
       window.BareMux = { 
         BareMuxConnection,
